@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>To-Do List</title>
+  </head>
+  <body>
+    <h1>To-Do List</h1>
+    <ul id="todo-list"></ul>
+    <form id="todo-form">
+      <input type="text" id="title" placeholder="Title" required />
+      <input type="text" id="description" placeholder="Description" required />
+      <button type="submit">Add To-Do</button>
+    </form>
+    <script>
+      async function editTodo(id) {
+        const res = await fetch(`/todos/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: Date.now(),
+            title: '수정됨',
+            description: '수정됨',
+            completed: false,
+          }),
+        });
+      }
+
+      async function deleteTodo(id) {
+        const res = await fetch(`/todos/${id}`, {
+          method: 'DELETE',
+        });
+      }
+
+      async function fetchTodos() {
+        const response = await fetch('/todos');
+        const todos = await response.json();
+        const todoList = document.getElementById('todo-list');
+        todoList.innerHTML = '';
+        todos.forEach((todo) => {
+          const li = document.createElement('li');
+          li.textContent = `${todo.title}: ${todo.description}`;
+          li.id = todo.id;
+
+          const editBtn = document.createElement('button');
+          editBtn.textContent = 'Edit';
+          editBtn.addEventListener('click', () => {
+            editTodo(todo.id);
+            // fetchTodos();
+            window.location.reload();
+          });
+          li.appendChild(editBtn);
+
+          const delBtn = document.createElement('button');
+          delBtn.textContent = 'Delete';
+          delBtn.addEventListener('click', () => {
+            deleteTodo(todo.id);
+            window.location.reload();
+          });
+          li.appendChild(delBtn);
+
+          todoList.appendChild(li);
+        });
+      }
+
+      document
+        .getElementById('todo-form')
+        .addEventListener('submit', async (event) => {
+          event.preventDefault();
+          const title = document.getElementById('title').value;
+          const description = document.getElementById('description').value;
+          const response = await fetch('/todos', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              id: Date.now(),
+              title,
+              description,
+              completed: false,
+            }),
+          });
+          if (response.ok) {
+            fetchTodos();
+          }
+        });
+
+      fetchTodos();
+    </script>
+  </body>
+</html>
