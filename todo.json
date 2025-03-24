@@ -1,20 +1,20 @@
 [
-    {
-        "id": 1742799132645,
-        "title": "\uc81c\ubaa9",
-        "description": "\ub0b4\uc6a9\uc218\uc815",
-        "completed": false
-    },
-    {
-        "id": 1742799007641,
-        "title": "\uc65c",
-        "description": "/",
-        "completed": false
-    },
-    {
-        "id": 1742796064476,
-        "title": "\uc218\uc815\ub428",
-        "description": "\uc218\uc815\ub428",
-        "completed": false
-    }
+  {
+    "id": 1742799132645,
+    "title": "\uc81c\ubaa9",
+    "description": "\ub0b4\uc6a9\uc218\uc815",
+    "completed": true
+  },
+  {
+    "id": 1742799007641,
+    "title": "\uc65c",
+    "description": "/",
+    "completed": false
+  },
+  {
+    "id": 1742796064476,
+    "title": "\uc218\uc815\ub428",
+    "description": "\uc218\uc815\ub428",
+    "completed": false
+  }
 ]
