@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import json
 import os
@@ -61,6 +62,7 @@ def delete_todo(todo_id: int):
     return {"message": "To-Do item deleted"}
 
 # HTML 파일 서빙
+app.mount("/static", StaticFiles(directory="static"), name="static")
 @app.get("/", response_class=HTMLResponse)
 def read_root():
     with open("templates/index.html", "r") as file:

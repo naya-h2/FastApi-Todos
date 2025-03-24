@@ -3,18 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>To-Do List</title>
+    <title>To-Do List | 안희원</title>
+
+    <link
+      rel="stylesheet"
+      as="style"
+      crossorigin
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
+    />
+    <link rel="stylesheet" href="/static/global.css" />
   </head>
   <body>
     <h1>To-Do List</h1>
-    <ul id="todo-list"></ul>
+    <div id="todo-list"></div>
     <form id="todo-form">
       <input type="text" id="title" placeholder="Title" required />
       <input type="text" id="description" placeholder="Description" required />
       <button type="submit">Add To-Do</button>
     </form>
     <script>
-      async function editTodo(id) {
+      async function editTodo(id, title, description) {
         const res = await fetch(`/todos/${id}`, {
           method: 'PUT',
           headers: {
@@ -22,8 +30,8 @@
           },
           body: JSON.stringify({
             id: Date.now(),
-            title: '수정됨',
-            description: '수정됨',
+            title,
+            description,
             completed: false,
           }),
         });
@@ -41,18 +49,36 @@
         const todoList = document.getElementById('todo-list');
         todoList.innerHTML = '';
         todos.forEach((todo) => {
-          const li = document.createElement('li');
-          li.textContent = `${todo.title}: ${todo.description}`;
+          const li = document.createElement('div');
           li.id = todo.id;
+
+          //체크박스 & 내용
+          const checkBox = document.createElement('input');
+          checkBox.id = todo.id;
+          checkBox.type = 'checkbox';
+          li.appendChild(checkBox);
+
+          const label = document.createElement('label');
+          label.htmlFor = todo.id;
+          label.textContent = `${todo.title}: ${todo.description}`;
+          li.appendChild(label);
+
+          // btn
+          const btnDiv = document.createElement('div');
 
           const editBtn = document.createElement('button');
           editBtn.textContent = 'Edit';
           editBtn.addEventListener('click', () => {
-            editTodo(todo.id);
+            const userInput = prompt(
+              '수정할 내용을 입력하세요.',
+              '/로 구분해 주세요. ex.할일1/설명1'
+            );
+            const u = userInput.split('/');
+            editTodo(todo.id, u[0], u[1]);
             // fetchTodos();
             window.location.reload();
           });
-          li.appendChild(editBtn);
+          btnDiv.appendChild(editBtn);
 
           const delBtn = document.createElement('button');
           delBtn.textContent = 'Delete';
@@ -60,7 +86,9 @@
             deleteTodo(todo.id);
             window.location.reload();
           });
-          li.appendChild(delBtn);
+          btnDiv.appendChild(delBtn);
+
+          li.appendChild(btnDiv);
 
           todoList.appendChild(li);
         });
