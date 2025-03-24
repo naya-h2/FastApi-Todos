@@ -3,3 +3,8 @@ html {
     BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
     'Open Sans', 'Helvetica Neue', sans-serif;
 }
+
+.todo-checkbox {
+  width: 16px;
+  height: 16px;
+}

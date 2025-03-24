@@ -14,9 +14,10 @@
     <link rel="stylesheet" href="/static/global.css" />
   </head>
   <body>
-    <h1>To-Do List</h1>
+    <h1>To-Do List ━ ✩・*。</h1>
     <div id="todo-list"></div>
     <form id="todo-form">
+      <input type="text" id="section" placeholder="Section" required />
       <input type="text" id="title" placeholder="Title" required />
       <input type="text" id="description" placeholder="Description" required />
       <button type="submit">Add To-Do</button>
@@ -50,18 +51,18 @@
         todoList.innerHTML = '';
         todos.forEach((todo) => {
           const li = document.createElement('div');
-          li.id = todo.id;
 
           //체크박스 & 내용
           const checkBox = document.createElement('input');
           checkBox.id = todo.id;
           checkBox.type = 'checkbox';
+          checkBox.className = 'todo-checkbox';
           checkBox.defaultChecked = todo.completed;
           li.appendChild(checkBox);
 
           const label = document.createElement('label');
           label.htmlFor = todo.id;
-          label.textContent = `${todo.title}: ${todo.description}`;
+          label.textContent = `<${todo.section}> ${todo.title}: ${todo.description}`;
           li.appendChild(label);
 
           // btn
@@ -101,6 +102,7 @@
           event.preventDefault();
           const title = document.getElementById('title').value;
           const description = document.getElementById('description').value;
+          const section = document.getElementById('section').value;
           const response = await fetch('/todos', {
             method: 'POST',
             headers: {
@@ -111,6 +113,7 @@
               title,
               description,
               completed: false,
+              section,
             }),
           });
           if (response.ok) {
