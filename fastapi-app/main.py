@@ -69,6 +69,13 @@ def delete_todo(todo_id: int):
     save_todos(todos)
     return {"message": "To-Do item deleted"}
 
+@app.get("/sections", response_model=list[str])
+def get_sections ():
+    items = load_todos()
+    sections = [item["section"] for item in items]
+    unique_sections = list(set(sections))
+    return unique_sections
+
 # HTML 파일 서빙
 app.mount("/static", StaticFiles(directory="static"), name="static")
 @app.get("/", response_class=HTMLResponse)
