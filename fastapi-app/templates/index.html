@@ -15,14 +15,36 @@
   </head>
   <body>
     <h1>To-Do List ━ ✩・*。</h1>
+    <select defaultSelected="default" id="todo-section">
+      <option id="default" value="default">기본</option>
+    </select>
     <div id="todo-list"></div>
     <form id="todo-form">
       <input type="text" id="section" placeholder="Section" required />
       <input type="text" id="title" placeholder="Title" required />
       <input type="text" id="description" placeholder="Description" required />
+      <input type="date" id="deadline" />
       <button type="submit">Add To-Do</button>
     </form>
     <script>
+      async function fetchSections() {
+        const response = await fetch('/sections');
+        const sections = await response.json();
+        const todoSection = document.getElementById('todo-section');
+        sections.forEach((section, idx) => {
+          const op = document.createElement('option');
+          op.id = idx;
+          op.value = section;
+          op.innerHTML = section;
+          todoSection.appendChild(op);
+        });
+      }
+
+      async function filterSection() {
+        const selectedValue = document.getElementById('todo-section').value;
+        fetchTodos(selectedValue);
+      }
+
       async function editTodo(id, title, description) {
         const res = await fetch(`/todos/${id}`, {
           method: 'PUT',
@@ -44,8 +66,8 @@
         });
       }
 
-      async function fetchTodos() {
-        const response = await fetch('/todos');
+      async function fetchTodos(section) {
+        const response = await fetch(`/todos?section=${section ?? ''}`);
         const todos = await response.json();
         const todoList = document.getElementById('todo-list');
         todoList.innerHTML = '';
@@ -62,7 +84,9 @@
 
           const label = document.createElement('label');
           label.htmlFor = todo.id;
-          label.textContent = `<${todo.section}> ${todo.title}: ${todo.description}`;
+          label.textContent = `[ ${todo.section} ] ${todo.title}: ${
+            todo.description
+          } (${todo.deadline ?? 'deadline없음'})`;
           li.appendChild(label);
 
           // btn
@@ -103,6 +127,8 @@
           const title = document.getElementById('title').value;
           const description = document.getElementById('description').value;
           const section = document.getElementById('section').value;
+          const deadline = document.getElementById('deadline').value;
+          console.log(deadline);
           const response = await fetch('/todos', {
             method: 'POST',
             headers: {
@@ -114,6 +140,7 @@
               description,
               completed: false,
               section,
+              deadline: String(deadline),
             }),
           });
           if (response.ok) {
@@ -121,7 +148,12 @@
           }
         });
 
+      document
+        .getElementById('todo-section')
+        .addEventListener('change', filterSection);
+
       fetchTodos();
+      fetchSections();
     </script>
   </body>
 </html>

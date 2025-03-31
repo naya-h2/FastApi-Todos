@@ -16,7 +16,7 @@ class TodoItem(BaseModel):
     description: str
     completed: bool
     section: str
-    deadline: date | None = None
+    deadline: str | None = None
 
 # JSON 파일 경로
 TODO_FILE = "todo.json"
