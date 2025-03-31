@@ -16,7 +16,7 @@ class TodoItem(BaseModel):
     description: str
     completed: bool
     section: str
-    deadline: Optional[date] = None
+    deadline: date | None = None
 
 # JSON 파일 경로
 TODO_FILE = "todo.json"
@@ -35,8 +35,12 @@ def save_todos(todos):
 
 # To-Do 목록 조회
 @app.get("/todos", response_model=list[TodoItem])
-def get_todos():
-    return load_todos()
+def get_todos(section: str | None = None):
+    items = load_todos()
+    if not section:
+        return items
+    filteredItems = [item for item in items if item["section"] == section]
+    return filteredItems
 
 # 신규 To-Do 항목 추가
 @app.post("/todos", response_model=TodoItem)
