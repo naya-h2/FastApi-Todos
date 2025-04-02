@@ -34,7 +34,7 @@ def save_todos(todos):
 
 # To-Do 목록 조회
 @app.get("/todos", response_model=list[TodoItem])
-def get_todos(section: str | None = None):
+def get_todos(section: Union[str, None] = None):
     items = load_todos()
     if not section:
         return items
