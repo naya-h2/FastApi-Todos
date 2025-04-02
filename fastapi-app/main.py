@@ -2,8 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from datetime import date
-from typing import Optional
+from typing import Union
 import json
 import os
 
@@ -16,7 +15,7 @@ class TodoItem(BaseModel):
     description: str
     completed: bool
     section: str
-    deadline: str | None = None
+    deadline: Union[str, None] = None
 
 # JSON 파일 경로
 TODO_FILE = "todo.json"
