@@ -6,6 +6,9 @@ from typing import Union
 import json
 import os
 import datetime
+from enum import Enum
+from itertools import groupby
+from operator import itemgetter
 
 app = FastAPI()
 
@@ -33,13 +36,38 @@ def save_todos(todos):
     with open(TODO_FILE, "w") as file:
         json.dump(todos, file, indent=4)
 
+class SortingType(str, Enum):
+    fast = "fast"
+    slow = "slow"
+
 # To-Do 목록 조회
 @app.get("/todos", response_model=list[TodoItem])
-def get_todos(section: Union[str, None] = None, year:Union[str, None] = None, month:Union[str, None] = None):
+def get_todos(section: Union[str, None] = None, sort:Union[SortingType, None] = None):
     items = load_todos()
     if section:
         items = [item for item in items if item["section"] == section]
-        
+    
+    if(sort == SortingType.fast):
+        sorted_tasks = sorted(
+        items, 
+        key=lambda x: x['deadline'] if x['deadline'] is not None else '9999-12-31'
+        )
+        items = sorted_tasks
+    
+    if(sort == SortingType.slow):
+        sorted_tasks = sorted(
+        items, 
+        key=lambda x: x['deadline'] if x['deadline'] is not None else '9999-12-31',
+        reverse=True
+        )
+        items = sorted_tasks
+
+
+    return items
+
+@app.post("/todos/deadline", response_model=list[TodoItem], description="데드라인별 todo 조회")
+def get_deadline_todos(year:Union[str, None] = None, month:Union[str, None] = None):
+    items = load_todos()
     if year or month:
         today = datetime.datetime.now().date()
         
@@ -57,7 +85,6 @@ def get_todos(section: Union[str, None] = None, year:Union[str, None] = None, mo
                 current_month_item.append(item)
         items = current_month_item
 
-    return items
 
 # 신규 To-Do 항목 추가
 @app.post("/todos", response_model=TodoItem)
