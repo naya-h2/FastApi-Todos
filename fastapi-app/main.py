@@ -40,7 +40,7 @@ class SortingType(str, Enum):
 
 # To-Do 목록 조회
 @app.get("/todos", response_model=list[TodoItem])
-def get_todos(section: Union[str, None] = None, sort:Union[SortingType, None] = None):
+def get_todos(section: Union[str, None] = None, sort:Union[SortingType, None] = SortingType.fast):
     items = load_todos()
     if section:
         items = [item for item in items if item["section"] == section]

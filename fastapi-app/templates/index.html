@@ -43,6 +43,18 @@
         font-size: 14px;
         color: grey;
       }
+
+      #todo-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .todo-box {
+        padding: 20px 24px;
+        border-radius: 16px;
+        background-color: rgb(242, 244, 246);
+      }
     </style>
   </head>
   <body>
@@ -65,6 +77,11 @@
     <hr />
 
     <h3>현재 등록된 전체 TODO 보기</h3>
+    정렬 선택:
+    <select id="sort-type" defaultSelected="fast">
+      <option id="fast" value="fast">deadline 빠른 순</option>
+      <option id="slow" value="slow">deadline 느린 순</option>
+    </select>
     <div id="todo-list"></div>
 
     <script>
@@ -86,8 +103,8 @@
         });
       }
 
-      async function filterSection() {
-        const selectedValue = document.getElementById('todo-section').value;
+      async function handleSelectSort() {
+        const selectedValue = document.getElementById('sort-type').value;
         fetchTodos(selectedValue);
       }
 
@@ -112,13 +129,14 @@
         });
       }
 
-      async function fetchTodos(section) {
-        const response = await fetch(`/todos?section=${section ?? ''}`);
+      async function fetchTodos(sortType = 'fast') {
+        const response = await fetch(`/todos?sort=${sortType ?? ''}`);
         const todos = await response.json();
         const todoList = document.getElementById('todo-list');
         todoList.innerHTML = '';
         todos.forEach((todo) => {
           const li = document.createElement('div');
+          li.className = 'todo-box';
 
           //체크박스 & 내용
           const checkBox = document.createElement('input');
@@ -174,7 +192,7 @@
           const description = document.getElementById('description').value;
           const section = document.getElementById('section').value;
           const deadline = document.getElementById('deadline').value;
-          console.log(deadline);
+
           const response = await fetch('/todos', {
             method: 'POST',
             headers: {
@@ -195,8 +213,8 @@
         });
 
       document
-        .getElementById('todo-section')
-        .addEventListener('change', filterSection);
+        .getElementById('sort-type')
+        .addEventListener('change', handleSelectSort);
 
       fetchTodos();
       fetchSections();
