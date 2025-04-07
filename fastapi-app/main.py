@@ -7,8 +7,6 @@ import json
 import os
 import datetime
 from enum import Enum
-from itertools import groupby
-from operator import itemgetter
 
 app = FastAPI()
 
@@ -120,10 +118,19 @@ def get_sections ():
     unique_sections = list(set(sections))
     return unique_sections
 
+
+##########################
+
 # HTML 파일 서빙
 app.mount("/static", StaticFiles(directory="static"), name="static")
 @app.get("/", response_class=HTMLResponse)
 def read_root():
     with open("templates/index.html", "r") as file:
+        content = file.read()
+    return HTMLResponse(content=content)
+
+@app.get("/section", response_class=HTMLResponse)
+def read_section_page():
+    with open("templates/section/index.html", "r") as file:
         content = file.read()
     return HTMLResponse(content=content)

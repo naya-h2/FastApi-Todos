@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      as="style"
+      crossorigin
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
+    />
+    <link rel="stylesheet" href="/static/global.css" />
+    <title>section별 할일 보기 | 안희원</title>
+  </head>
+  <body>
+    <h1 id="section_name"></h1>
+    <p id="section_description"></p>
+    <hr />
+    <div id="todo-list"></div>
+  </body>
+  <script>
+    async function fetchTodos(section) {
+      const response = await fetch(`/todos?section=${section ?? ''}`);
+      const todos = await response.json();
+      const todoList = document.getElementById('todo-list');
+      todoList.innerHTML = '';
+      todos.forEach((todo) => {
+        const li = document.createElement('div');
+
+        //체크박스 & 내용
+        const checkBox = document.createElement('input');
+        checkBox.id = todo.id;
+        checkBox.type = 'checkbox';
+        checkBox.className = 'todo-checkbox';
+        checkBox.defaultChecked = todo.completed;
+        li.appendChild(checkBox);
+
+        const label = document.createElement('label');
+        label.htmlFor = todo.id;
+        label.textContent = `[ ${todo.section} ] ${todo.title}: ${
+          todo.description
+        } (${todo.deadline ?? 'deadline없음'})`;
+        li.appendChild(label);
+
+        // btn
+        const btnDiv = document.createElement('div');
+
+        const editBtn = document.createElement('button');
+        editBtn.textContent = 'Edit';
+        editBtn.addEventListener('click', () => {
+          const userInput = prompt(
+            '수정할 내용을 입력하세요.',
+            '/로 구분해 주세요. ex.할일1/설명1'
+          );
+          const u = userInput.split('/');
+          editTodo(todo.id, u[0], u[1]);
+          // fetchTodos();
+          window.location.reload();
+        });
+        btnDiv.appendChild(editBtn);
+
+        const delBtn = document.createElement('button');
+        delBtn.textContent = 'Delete';
+        delBtn.addEventListener('click', () => {
+          deleteTodo(todo.id);
+          window.location.reload();
+        });
+        btnDiv.appendChild(delBtn);
+
+        li.appendChild(btnDiv);
+
+        todoList.appendChild(li);
+      });
+    }
+
+    // 페이지가 로드될 때
+    window.onload = function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const section = urlParams.get('s');
+
+      document.getElementById(
+        'section_name'
+      ).textContent = `TODO LIST [ ${section} ]`;
+      document.getElementById(
+        'section_description'
+      ).textContent = `[ ${section} ] section에 해당하는 TODO 목록입니다.`;
+
+      fetchTodos(section);
+    };
+  </script>
+</html>
