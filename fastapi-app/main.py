@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from typing import Union
 import json
 import os
+import datetime
 
 app = FastAPI()
 
@@ -34,12 +35,29 @@ def save_todos(todos):
 
 # To-Do 목록 조회
 @app.get("/todos", response_model=list[TodoItem])
-def get_todos(section: Union[str, None] = None):
+def get_todos(section: Union[str, None] = None, year:Union[str, None] = None, month:Union[str, None] = None):
     items = load_todos()
-    if not section:
-        return items
-    filteredItems = [item for item in items if item["section"] == section]
-    return filteredItems
+    if section:
+        items = [item for item in items if item["section"] == section]
+        
+    if year or month:
+        today = datetime.datetime.now().date()
+        
+        if(not year): year = today.year
+        if(not month): month = today.month
+
+        current_month_item = []
+        for item in items:
+            if item["deadline"] is None: continue
+
+            deadline_date = datetime.datetime.strptime(item["deadline"], "%Y-%m-%d")
+        
+            # year와 month에 해당하는지 확인
+            if deadline_date.year == int(year) and deadline_date.month == int(month):
+                current_month_item.append(item)
+        items = current_month_item
+
+    return items
 
 # 신규 To-Do 항목 추가
 @app.post("/todos", response_model=TodoItem)
