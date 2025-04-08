@@ -122,7 +122,6 @@ def get_sections ():
 ##########################
 
 # HTML 파일 서빙
-app.mount("/static", StaticFiles(directory="static"), name="static")
 @app.get("/", response_class=HTMLResponse)
 def read_root():
     with open("templates/index.html", "r") as file:
