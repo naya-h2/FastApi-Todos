@@ -22,7 +22,7 @@ def test_get_todos_empty():
     assert response.json() == []
 
 def test_get_todos_with_items():
-    todo = TodoItem(id=1, title="Test", description="Test description", completed=False)
+    todo = TodoItem(id=1, section="Test section", title="Test", description="Test description", completed=False)
     save_todos([todo.dict()])
     response = client.get("/todos")
     assert response.status_code == 200
@@ -30,7 +30,7 @@ def test_get_todos_with_items():
     assert response.json()[0]["title"] == "Test"
 
 def test_create_todo():
-    todo = {"id": 1, "title": "Test", "description": "Test description", "completed": False}
+    todo = {"id": 1, "section": "Test section", "title": "Test", "description": "Test description", "completed": False}
     response = client.post("/todos", json=todo)
     assert response.status_code == 200
     assert response.json()["title"] == "Test"
@@ -41,20 +41,20 @@ def test_create_todo_invalid():
     assert response.status_code == 422
 
 def test_update_todo():
-    todo = TodoItem(id=1, title="Test", description="Test description", completed=False)
+    todo = TodoItem(id=1, section="Test section", title="Test", description="Test description", completed=False)
     save_todos([todo.dict()])
-    updated_todo = {"id": 1, "title": "Updated", "description": "Updated description", "completed": True}
+    updated_todo = {"id": 1, "section": "Updated secction", "title": "Updated", "description": "Updated description", "completed": True}
     response = client.put("/todos/1", json=updated_todo)
     assert response.status_code == 200
     assert response.json()["title"] == "Updated"
 
 def test_update_todo_not_found():
-    updated_todo = {"id": 1, "title": "Updated", "description": "Updated description", "completed": True}
+    updated_todo = {"id": 1, "section": "Updated secction", "title": "Updated", "description": "Updated description", "completed": True}
     response = client.put("/todos/1", json=updated_todo)
     assert response.status_code == 404
 
 def test_delete_todo():
-    todo = TodoItem(id=1, title="Test", description="Test description", completed=False)
+    todo = TodoItem(id=1, section="Test section", title="Test", description="Test description", completed=False)
     save_todos([todo.dict()])
     response = client.delete("/todos/1")
     assert response.status_code == 200
