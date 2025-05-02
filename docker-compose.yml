@@ -22,8 +22,8 @@ services:
       - sonarqube_logs:/opt/sonarqube/logs
       - sonarqube_extensions:/opt/sonarqube/extensions
 
-  volumes:
-    sonarqube_conf:
-    sonarqube_data:
-    sonarqube_logs:
-    sonarqube_extensions:
+volumes:
+  sonarqube_conf:
+  sonarqube_data:
+  sonarqube_logs:
+  sonarqube_extensions:
