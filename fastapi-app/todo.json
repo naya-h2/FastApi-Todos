@@ -8,10 +8,10 @@
         "deadline": null
     },
     {
-        "id": 1742815860438,
+        "id": 1746609852158,
         "title": "\uacfc\uc81c1",
         "description": "\uacfc\uc81c1 \ucf54\ub4dc \ubd84\uc11d\ud558\uae30",
-        "completed": false,
+        "completed": true,
         "section": "\uc778\uc5b8\uac1c",
         "deadline": null
     },
@@ -24,20 +24,20 @@
         "deadline": "2025-04-11"
     },
     {
-        "id": 1744029691432,
-        "title": "\uc2dc\ubbac\ub808\uc774\ud130 \uacf5\ubd80",
-        "description": "\ub2e4\uc74c \uc8fc \ud68c\uc758\uae4c\uc9c0 \uacf5\ubd80\ud558\uae30",
-        "completed": false,
+        "id": 1746609752609,
+        "title": "\uc65c",
+        "description": "\uc548\ub418\ub0d0\uace0",
+        "completed": true,
         "section": "\ucea1\ub5142",
-        "deadline": "2025-04-09"
+        "deadline": null
     },
     {
-        "id": 1744032111277,
+        "id": 1746609845220,
         "title": "6\uc8fc\ucc28 \uacfc\uc81c",
         "description": "month \ubdf0 \ub123\u3131\u3163",
-        "completed": false,
+        "completed": true,
         "section": "\uc624\ud508\uc18c\uc2a4",
-        "deadline": "2025-04-16"
+        "deadline": null
     },
     {
         "id": 1744032504468,

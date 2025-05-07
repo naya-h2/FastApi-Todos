@@ -9,7 +9,6 @@
       crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
     />
-    <link rel="stylesheet" href="/static/global.css" />
     <title>section별 할일 보기 | 안희원</title>
   </head>
   <body>
@@ -34,6 +33,15 @@
         checkBox.className = 'todo-checkbox';
         checkBox.defaultChecked = todo.completed;
         li.appendChild(checkBox);
+        checkBox.addEventListener('click', () => {
+          editTodo(
+            todo.id,
+            todo.title,
+            todo.description,
+            todo.section,
+            !todo.completed
+          );
+        });
 
         const label = document.createElement('label');
         label.htmlFor = todo.id;
@@ -53,7 +61,7 @@
             '/로 구분해 주세요. ex.할일1/설명1'
           );
           const u = userInput.split('/');
-          editTodo(todo.id, u[0], u[1]);
+          editTodo(todo.id, u[0], u[1], todo.section, todo.completed);
           // fetchTodos();
           window.location.reload();
         });

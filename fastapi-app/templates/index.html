@@ -11,7 +11,6 @@
       crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
     />
-    <link rel="stylesheet" href="/static/global.css" />
     <style>
       html {
         font-family: 'Pretendard Variable', Pretendard, system-ui, -apple-system,
@@ -114,7 +113,7 @@
         fetchTodos(selectedValue);
       }
 
-      async function editTodo(id, title, description) {
+      async function editTodo(id, title, description, section, completed) {
         const res = await fetch(`/todos/${id}`, {
           method: 'PUT',
           headers: {
@@ -124,7 +123,8 @@
             id: Date.now(),
             title,
             description,
-            completed: false,
+            section,
+            completed,
           }),
         });
       }
@@ -150,6 +150,15 @@
           checkBox.type = 'checkbox';
           checkBox.className = 'todo-checkbox';
           checkBox.defaultChecked = todo.completed;
+          checkBox.addEventListener('click', () => {
+            editTodo(
+              todo.id,
+              todo.title,
+              todo.description,
+              todo.section,
+              !todo.completed
+            );
+          });
           li.appendChild(checkBox);
 
           const label = document.createElement('label');
@@ -170,8 +179,8 @@
               '/로 구분해 주세요. ex.할일1/설명1'
             );
             const u = userInput.split('/');
-            editTodo(todo.id, u[0], u[1]);
-            // fetchTodos();
+            editTodo(todo.id, u[0], u[1], todo.section, todo.completed);
+
             window.location.reload();
           });
           btnDiv.appendChild(editBtn);
