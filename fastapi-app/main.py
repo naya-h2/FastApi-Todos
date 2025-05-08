@@ -82,6 +82,7 @@ def get_deadline_todos(year:Union[str, None] = None, month:Union[str, None] = No
             if deadline_date.year == int(year) and deadline_date.month == int(month):
                 current_month_item.append(item)
         items = current_month_item
+    return items
 
 
 # 신규 To-Do 항목 추가
