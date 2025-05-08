@@ -150,14 +150,15 @@
           checkBox.type = 'checkbox';
           checkBox.className = 'todo-checkbox';
           checkBox.defaultChecked = todo.completed;
-          checkBox.addEventListener('click', () => {
-            editTodo(
+          checkBox.addEventListener('click', async () => {
+            await editTodo(
               todo.id,
               todo.title,
               todo.description,
               todo.section,
               !todo.completed
             );
+            if (!todo.completed === true) window.alert('할일을 완료했습니다!');
           });
           li.appendChild(checkBox);
 
