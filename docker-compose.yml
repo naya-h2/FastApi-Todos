@@ -48,6 +48,16 @@ services:
     ports:
       - '9100:9100'
 
+  cadvisor: #서비스 이름
+    image: gcr.io/cadvisor/cadvisor:latest #아미지 이름
+    ports:
+      - '8081:8080'
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+
 volumes:
   sonarqube_conf:
   sonarqube_data:
