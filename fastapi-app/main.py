@@ -98,6 +98,16 @@ def create_todo(todo: TodoItem):
     save_todos(todos)
     return todo
 
+
+@app.get("/todos/{todo_id}", response_model=TodoItem)
+def get_todo(todo_id: int):
+    todos = load_todos()
+    for todo in todos:
+        if todo["id"] != todo_id:
+            continue
+        return todo
+
+
 # To-Do 항목 수정
 @app.put("/todos/{todo_id}", response_model=TodoItem)
 def update_todo(todo_id: int, updated_todo: TodoItem):
@@ -137,5 +147,11 @@ def read_root():
 @app.get("/section", response_class=HTMLResponse)
 def read_section_page():
     with open("templates/section/index.html", "r") as file:
+        content = file.read()
+    return HTMLResponse(content=content)
+
+@app.get("/edit", response_class=HTMLResponse)
+def read_section_page():
+    with open("templates/edit/index.html", "r") as file:
         content = file.read()
     return HTMLResponse(content=content)
