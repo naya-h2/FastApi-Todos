@@ -113,7 +113,14 @@
         fetchTodos(selectedValue);
       }
 
-      async function editTodo(id, title, description, section, completed) {
+      async function editTodo(
+        id,
+        title,
+        description,
+        section,
+        completed,
+        deadline
+      ) {
         const res = await fetch(`/todos/${id}`, {
           method: 'PUT',
           headers: {
@@ -125,6 +132,7 @@
             description,
             section,
             completed,
+            deadline,
           }),
         });
       }
@@ -156,7 +164,8 @@
               todo.title,
               todo.description,
               todo.section,
-              !todo.completed
+              !todo.completed,
+              todo.deadline
             );
             if (!todo.completed === true) window.alert('할일을 완료했습니다!');
           });
@@ -175,14 +184,7 @@
           const editBtn = document.createElement('button');
           editBtn.textContent = 'Edit';
           editBtn.addEventListener('click', () => {
-            const userInput = prompt(
-              '수정할 내용을 입력하세요.',
-              '/로 구분해 주세요. ex.할일1/설명1'
-            );
-            const u = userInput.split('/');
-            editTodo(todo.id, u[0], u[1], todo.section, todo.completed);
-
-            window.location.reload();
+            window.location.href = `/edit?todo_id=${todo.id}`;
           });
           btnDiv.appendChild(editBtn);
 
