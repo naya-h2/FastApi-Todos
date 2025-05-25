@@ -19,6 +19,12 @@
         box-sizing: border-box;
       }
 
+      h3 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 20px;
+      }
+
       .tag {
         padding: 8px 12px;
         border-radius: 8px;
@@ -52,9 +58,35 @@
       }
 
       .todo-box {
-        padding: 20px 24px;
-        border-radius: 16px;
-        background-color: rgb(242, 244, 246);
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 12px;
+        /* border-radius: 16px; */
+        /* background-color: rgb(242, 244, 246); */
+        font-size: 14px;
+        border-bottom: 1px solid #f3f3f3;
+      }
+
+      .todobox-left {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .todobox-right {
+        display: flex;
+        align-items: center;
+        font-size: 12px;
+        gap: 4px;
+      }
+
+      .todobox-deadline {
+        color: #e03131;
+      }
+
+      .todobox-section {
+        padding: 4px 8px;
+        border-radius: 24px;
       }
 
       input {
@@ -70,25 +102,6 @@
         gap: 12px;
       }
 
-      form {
-        display: flex;
-        flex-direction: column;
-        gap: 24px;
-        max-width: 480px;
-      }
-
-      .submit-button {
-        margin-top: 48px;
-        padding: 20px 16px;
-        background-color: pink;
-        border-radius: 24px;
-        border: none;
-        cursor: pointer;
-      }
-      .submit-button:hover {
-        background-color: #ffc5cf;
-      }
-
       nav {
         padding: 8px;
         border-right: 1px solid #f3f3f3;
@@ -100,7 +113,7 @@
       }
 
       section {
-        padding: 16px;
+        padding: 0 16px;
         min-width: 370px;
         width: 60%;
         border-right: 1px solid #f3f3f3;
@@ -117,6 +130,7 @@
         outline: none;
         border: none;
         text-align: left;
+        width: 100%;
 
         display: flex;
         gap: 8px;
@@ -133,6 +147,16 @@
       #todo-section {
         display: flex;
         flex-direction: column;
+      }
+
+      header {
+        padding: 14px 20px;
+      }
+
+      a {
+        width: 100%;
+        text-decoration: none;
+        color: gray;
       }
     </style>
   </head>
@@ -157,26 +181,37 @@
       <div id="todo-section"></div>
     </nav>
     <section>
-      <h1>TODO LIST ━ ✩・*。</h1>
-
-      <a href="/post">TODO 등록하러가기</a>
+      <header>
+        <h3>기본함</h3>
+      </header>
+      <button class="nav-btn">
+        <a href="/post">+ 할 일 추가</a>
+      </button>
 
       <br />
-      <hr />
 
-      <h3>현재 등록된 전체 TODO 보기</h3>
-      정렬 선택:
       <select id="sort-type" defaultSelected="fast">
         <option id="fast" value="fast">deadline 빠른 순</option>
         <option id="slow" value="slow">deadline 느린 순</option>
       </select>
+
       <div id="todo-list"></div>
     </section>
 
     <script>
+      const SECTION_COLOR = [
+        '#fcb9aa',
+        '#fee1e8',
+        '#c6dbda',
+        '#fed7c3',
+        '#f6eac2',
+        '#ecd5e3',
+        '#d4f0f0',
+      ];
+      let sections;
       async function fetchSections() {
         const response = await fetch('/sections');
-        const sections = await response.json();
+        sections = await response.json();
         const todoSection = document.getElementById('todo-section');
         sections.forEach((section, idx) => {
           const op = document.createElement('button');
@@ -237,6 +272,8 @@
           li.className = 'todo-box';
 
           //체크박스 & 내용
+          const left = document.createElement('div');
+          left.className = 'todobox-left';
           const checkBox = document.createElement('input');
           checkBox.id = todo.id;
           checkBox.type = 'checkbox';
@@ -251,40 +288,60 @@
               !todo.completed,
               todo.deadline
             );
-            if (!todo.completed === true) window.alert('할일을 완료했습니다!');
+            if (todo.completed === false) window.alert('할일을 완료했습니다!');
+            else window.alert('할일 완료를 취소하였습니다.');
           });
-          li.appendChild(checkBox);
+          left.appendChild(checkBox);
 
-          const label = document.createElement('label');
-          label.htmlFor = todo.id;
-          label.textContent = `[ ${todo.section} ] ${todo.title}: ${
-            todo.description
-          } (${todo.deadline ?? 'deadline없음'})`;
-          li.appendChild(label);
+          const label = document.createElement('div');
+          label.textContent = `${todo.title}: ${todo.description}`;
+          left.appendChild(label);
+          li.appendChild(left);
+
+          const right = document.createElement('div');
+          right.className = 'todobox-right';
+          const section = document.createElement('span');
+          section.className = `todobox-section`;
+          section.textContent = todo.section;
+          const idx = sections.indexOf(todo.section);
+          section.style.backgroundColor =
+            SECTION_COLOR[idx % SECTION_COLOR.length];
+          right.appendChild(section);
+
+          if (todo?.deadline) {
+            const deadline = document.createElement('span');
+            deadline.className = `todobox-deadline`;
+            deadline.textContent = todo.deadline;
+            right.appendChild(deadline);
+          }
+
+          li.appendChild(right);
 
           // btn
-          const btnDiv = document.createElement('div');
+          // const btnDiv = document.createElement('div');
 
-          const editBtn = document.createElement('button');
-          editBtn.textContent = 'Edit';
-          editBtn.addEventListener('click', () => {
-            window.location.href = `/edit?todo_id=${todo.id}`;
-          });
-          btnDiv.appendChild(editBtn);
+          // const editBtn = document.createElement('button');
+          // editBtn.textContent = 'Edit';
+          // editBtn.addEventListener('click', () => {
+          //   window.location.href = `/edit?todo_id=${todo.id}`;
+          // });
+          // btnDiv.appendChild(editBtn);
 
-          const delBtn = document.createElement('button');
-          delBtn.textContent = 'Delete';
-          delBtn.addEventListener('click', () => {
-            deleteTodo(todo.id);
-            window.location.reload();
-          });
-          btnDiv.appendChild(delBtn);
+          // const delBtn = document.createElement('button');
+          // delBtn.textContent = 'Delete';
+          // delBtn.addEventListener('click', () => {
+          //   deleteTodo(todo.id);
+          //   window.location.reload();
+          // });
+          // btnDiv.appendChild(delBtn);
 
-          li.appendChild(btnDiv);
+          // li.appendChild(btnDiv);
 
           todoList.appendChild(li);
         });
       }
+
+      fetchSections();
 
       document
         .getElementById('sort-type')
@@ -321,7 +378,6 @@
 
       navBtn();
       fetchTodos();
-      fetchSections();
     </script>
   </body>
 </html>
