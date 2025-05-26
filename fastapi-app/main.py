@@ -50,7 +50,7 @@ class DeadlineType(str, Enum):
 
 # To-Do 목록 조회
 @app.get("/todos", response_model=list[TodoItem])
-def get_todos(section: Union[str, None] = None, sort:Union[SortingType, None] = SortingType.fast, deadline: Union[DeadlineType, None] = None, isCompleted: bool = False):
+def get_todos(section: Union[str, None] = None, sort:Union[SortingType, None] = SortingType.fast, isCompleted: bool = False):
     items = load_todos()
 
     # isCompleted
@@ -77,8 +77,56 @@ def get_todos(section: Union[str, None] = None, sort:Union[SortingType, None] = 
     return items
 
 
+
 @app.post("/todos/deadline", response_model=list[TodoItem], description="데드라인별 todo 조회")
-def get_deadline_todos(year:Union[str, None] = None, month:Union[str, None] = None):
+def get_deadline_todos(type:DeadlineType = DeadlineType.today):
+    items = load_todos()
+    today = datetime.datetime.now().date()
+    if type == DeadlineType.today:
+        current_item = []
+        for item in items:
+            if item["deadline"] is None: continue
+
+            deadline_date = datetime.datetime.strptime(item["deadline"], "%Y-%m-%d")
+        
+            # year와 month에 해당하는지 확인
+            if deadline_date.year == int(today.year) and deadline_date.month == int(today.month) and deadline_date.day == int(today.day):
+                current_item.append(item)
+
+    if type == DeadlineType.tomorrow:
+        current_item = []
+        for item in items:
+            if item["deadline"] is None: continue
+
+            deadline_date = datetime.datetime.strptime(item["deadline"], "%Y-%m-%d")
+        
+            # year와 month에 해당하는지 확인
+            if deadline_date.year == int(today.year) and deadline_date.month == int(today.month) and deadline_date.day == int(today.day) + 1:
+                current_item.append(item)
+    
+    if type == DeadlineType.week:
+        start_of_week = today - datetime.timedelta(days=today.weekday())  # 이번 주 월요일
+        end_of_week = start_of_week + datetime.timedelta(days=6)          # 이번 주 일요일
+        current_item = []
+        for item in items:
+            if item["deadline"] is None: continue
+
+            deadline_date = datetime.datetime.strptime(item["deadline"], "%Y-%m-%d").date()
+        
+            if start_of_week <= deadline_date <= end_of_week:
+                current_item.append(item)
+
+    #날짜순으로 정렬
+    sorted_tasks = sorted(
+        current_item, 
+        key=lambda x: x['deadline'] if x['deadline'] is not None else '9999-12-31'
+    )
+        
+    return sorted_tasks
+
+
+@app.post("/todos/month", response_model=list[TodoItem], description="월별 todo 조회")
+def get_month_todos(year:Union[str, None] = None, month:Union[str, None] = None):
     items = load_todos()
     if year or month:
         today = datetime.datetime.now().date()
@@ -97,7 +145,6 @@ def get_deadline_todos(year:Union[str, None] = None, month:Union[str, None] = No
                 current_month_item.append(item)
         items = current_month_item
     return items
-
 
 # 신규 To-Do 항목 추가
 @app.post("/todos", response_model=TodoItem)
@@ -174,5 +221,11 @@ def read_section_page():
 @app.get("/tasks/completed", response_class=HTMLResponse)
 def read_section_page():
     with open("templates/tasks/completed/index.html", "r") as file:
+        content = file.read()
+    return HTMLResponse(content=content)
+
+@app.get("/tasks/today", response_class=HTMLResponse)
+def read_section_page():
+    with open("templates/tasks/today/index.html", "r") as file:
         content = file.read()
     return HTMLResponse(content=content)
