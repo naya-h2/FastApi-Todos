@@ -78,7 +78,7 @@ def get_todos(section: Union[str, None] = None, sort:Union[SortingType, None] = 
 
 
 
-@app.post("/todos/deadline", response_model=list[TodoItem], description="데드라인별 todo 조회")
+@app.get("/deadline", response_model=list[TodoItem], description="데드라인별 todo 조회")
 def get_deadline_todos(type:DeadlineType = DeadlineType.today):
     items = load_todos()
     today = datetime.datetime.now().date()
@@ -116,16 +116,17 @@ def get_deadline_todos(type:DeadlineType = DeadlineType.today):
             if start_of_week <= deadline_date <= end_of_week:
                 current_item.append(item)
 
+    items = current_item
     #날짜순으로 정렬
     sorted_tasks = sorted(
-        current_item, 
+        items, 
         key=lambda x: x['deadline'] if x['deadline'] is not None else '9999-12-31'
     )
         
     return sorted_tasks
 
 
-@app.post("/todos/month", response_model=list[TodoItem], description="월별 todo 조회")
+@app.get("/month", response_model=list[TodoItem], description="월별 todo 조회")
 def get_month_todos(year:Union[str, None] = None, month:Union[str, None] = None):
     items = load_todos()
     if year or month:

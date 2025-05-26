@@ -169,6 +169,10 @@
       .completed {
         margin-top: 48px;
       }
+      #nav-today {
+        border-radius: 8px;
+        background-color: #f3f3f3;
+      }
     </style>
   </head>
   <body>
@@ -197,7 +201,7 @@
     </nav>
     <section>
       <header>
-        <h3>완료된 할 일</h3>
+        <h3>오늘</h3>
       </header>
       <button class="nav-btn">
         <a href="/post">+ 할 일 추가</a>
@@ -210,7 +214,7 @@
         <option id="slow" value="slow">deadline 느린 순</option>
       </select> -->
 
-      <div id="todo-completed"></div>
+      <div id="todo-list"></div>
     </section>
 
     <script>
@@ -278,11 +282,11 @@
       }
 
       async function fetchTodos(sortType = 'fast') {
-        const response_c = await fetch(`/todos?isCompleted=true`);
-        const todos_c = await response_c.json();
+        const response_c = await fetch(`/deadline?type=today`);
+        const todos = await response_c.json();
 
-        const completedList = document.getElementById('todo-completed');
-        todos_c.forEach((todo) => {
+        const todoList = document.getElementById('todo-list');
+        todos.forEach((todo) => {
           const li = document.createElement('div');
           li.className = 'todo-box';
 
@@ -332,15 +336,11 @@
 
           li.appendChild(right);
 
-          completedList.appendChild(li);
+          todoList.appendChild(li);
         });
       }
 
       fetchSections();
-
-      // document
-      //   .getElementById('sort-type')
-      //   .addEventListener('change', handleSelectSort);
 
       async function navBtn() {
         document
