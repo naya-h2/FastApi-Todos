@@ -225,8 +225,8 @@ def read_section_page():
         content = file.read()
     return HTMLResponse(content=content)
 
-@app.get("/tasks/today", response_class=HTMLResponse)
+@app.get("/tasks/day", response_class=HTMLResponse)
 def read_section_page():
-    with open("templates/tasks/today/index.html", "r") as file:
+    with open("templates/tasks/day/index.html", "r") as file:
         content = file.read()
     return HTMLResponse(content=content)

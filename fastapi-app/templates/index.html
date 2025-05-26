@@ -434,21 +434,21 @@
           .getElementById('nav-today')
           .addEventListener(
             'click',
-            () => (window.location.href = '/tasks/today')
+            () => (window.location.href = '/tasks/day?type=today')
           );
 
         document
           .getElementById('nav-tomorrow')
           .addEventListener(
             'click',
-            () => (window.location.href = '/tasks/tomorrow')
+            () => (window.location.href = '/tasks/day?type=tomorrow')
           );
 
         document
           .getElementById('nav-week')
           .addEventListener(
             'click',
-            () => (window.location.href = '/tasks/week')
+            () => (window.location.href = '/tasks/day?type=week')
           );
 
         document

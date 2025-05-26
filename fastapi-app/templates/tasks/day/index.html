@@ -169,10 +169,6 @@
       .completed {
         margin-top: 48px;
       }
-      #nav-today {
-        border-radius: 8px;
-        background-color: #f3f3f3;
-      }
     </style>
   </head>
   <body>
@@ -201,7 +197,7 @@
     </nav>
     <section>
       <header>
-        <h3>오늘</h3>
+        <h3 id="day_type"></h3>
       </header>
       <button class="nav-btn">
         <a href="/post">+ 할 일 추가</a>
@@ -281,8 +277,8 @@
         });
       }
 
-      async function fetchTodos(sortType = 'fast') {
-        const response_c = await fetch(`/deadline?type=today`);
+      async function fetchTodos(type) {
+        const response_c = await fetch(`/deadline?type=${type}`);
         const todos = await response_c.json();
 
         const todoList = document.getElementById('todo-list');
@@ -347,21 +343,21 @@
           .getElementById('nav-today')
           .addEventListener(
             'click',
-            () => (window.location.href = '/tasks/today')
+            () => (window.location.href = '/tasks/day?type=today')
           );
 
         document
           .getElementById('nav-tomorrow')
           .addEventListener(
             'click',
-            () => (window.location.href = '/tasks/tomorrow')
+            () => (window.location.href = '/tasks/day?type=tomorrow')
           );
 
         document
           .getElementById('nav-week')
           .addEventListener(
             'click',
-            () => (window.location.href = '/tasks/week')
+            () => (window.location.href = '/tasks/day?type=week')
           );
 
         document
@@ -378,9 +374,25 @@
             () => (window.location.href = '/tasks/completed')
           );
       }
-
       navBtn();
-      fetchTodos();
+
+      // 페이지가 로드될 때
+      window.onload = function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const type = urlParams.get('type');
+        const TITLE = {
+          today: '오늘',
+          tomorrow: '내일',
+          week: '다음 7일',
+        };
+
+        document.getElementById('day_type').textContent = TITLE[type];
+        document.getElementById(`nav-${type}`).style.backgroundColor =
+          '#f3f3f3';
+        document.getElementById(`nav-${type}`).style.borderRadius = '8px';
+
+        fetchTodos(type);
+      };
     </script>
   </body>
 </html>
