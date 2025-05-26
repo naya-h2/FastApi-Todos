@@ -3,8 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>안희원의 투두리스트💫</title>
-
+    <title>완료된 할 일</title>
     <link
       rel="stylesheet"
       as="style"
@@ -54,11 +53,6 @@
       #todo-list {
         display: flex;
         flex-direction: column;
-        gap: 12px;
-      }
-
-      #todo-completed {
-        opacity: 40%;
       }
 
       .todo-box {
@@ -177,7 +171,6 @@
       }
     </style>
   </head>
-
   <body>
     <nav>
       <p><b>20211550 안희원</b> 님, 안녕하세요!</p>
@@ -204,7 +197,7 @@
     </nav>
     <section>
       <header>
-        <h3>기본함</h3>
+        <h3>완료된 할 일</h3>
       </header>
       <button class="nav-btn">
         <a href="/post">+ 할 일 추가</a>
@@ -212,13 +205,11 @@
 
       <br />
 
-      <select id="sort-type" defaultSelected="fast">
+      <!-- <select id="sort-type" defaultSelected="fast">
         <option id="fast" value="fast">deadline 빠른 순</option>
         <option id="slow" value="slow">deadline 느린 순</option>
-      </select>
+      </select> -->
 
-      <div id="todo-list"></div>
-      <div class="completed">완료</div>
       <div id="todo-completed"></div>
     </section>
 
@@ -287,86 +278,8 @@
       }
 
       async function fetchTodos(sortType = 'fast') {
-        const response = await fetch(`/todos?sort=${sortType ?? ''}`);
-        const todos = await response.json();
-
         const response_c = await fetch(`/todos?isCompleted=true`);
         const todos_c = await response_c.json();
-
-        const todoList = document.getElementById('todo-list');
-        todoList.innerHTML = '';
-        todos.forEach((todo) => {
-          const li = document.createElement('div');
-          li.className = 'todo-box';
-
-          //체크박스 & 내용
-          const left = document.createElement('div');
-          left.className = 'todobox-left';
-          const checkBox = document.createElement('input');
-          checkBox.id = todo.id;
-          checkBox.type = 'checkbox';
-          checkBox.className = 'todo-checkbox';
-          checkBox.defaultChecked = todo.completed;
-          checkBox.addEventListener('click', async () => {
-            await editTodo(
-              todo.id,
-              todo.title,
-              todo.description,
-              todo.section,
-              !todo.completed,
-              todo.deadline
-            );
-            if (todo.completed === false) window.alert('할일을 완료했습니다!');
-            else window.alert('할일 완료를 취소하였습니다.');
-          });
-          left.appendChild(checkBox);
-
-          const label = document.createElement('div');
-          label.textContent = `${todo.title}: ${todo.description}`;
-          left.appendChild(label);
-          li.appendChild(left);
-
-          const right = document.createElement('div');
-          right.className = 'todobox-right';
-          const section = document.createElement('span');
-          section.className = `todobox-section`;
-          section.textContent = todo.section;
-          const idx = sections.indexOf(todo.section);
-          section.style.backgroundColor =
-            SECTION_COLOR[idx % SECTION_COLOR.length];
-          right.appendChild(section);
-
-          if (todo?.deadline) {
-            const deadline = document.createElement('span');
-            deadline.className = `todobox-deadline`;
-            deadline.textContent = todo.deadline;
-            right.appendChild(deadline);
-          }
-
-          li.appendChild(right);
-
-          // btn
-          // const btnDiv = document.createElement('div');
-
-          // const editBtn = document.createElement('button');
-          // editBtn.textContent = 'Edit';
-          // editBtn.addEventListener('click', () => {
-          //   window.location.href = `/edit?todo_id=${todo.id}`;
-          // });
-          // btnDiv.appendChild(editBtn);
-
-          // const delBtn = document.createElement('button');
-          // delBtn.textContent = 'Delete';
-          // delBtn.addEventListener('click', () => {
-          //   deleteTodo(todo.id);
-          //   window.location.reload();
-          // });
-          // btnDiv.appendChild(delBtn);
-
-          // li.appendChild(btnDiv);
-
-          todoList.appendChild(li);
-        });
 
         const completedList = document.getElementById('todo-completed');
         todos_c.forEach((todo) => {
@@ -425,9 +338,9 @@
 
       fetchSections();
 
-      document
-        .getElementById('sort-type')
-        .addEventListener('change', handleSelectSort);
+      // document
+      //   .getElementById('sort-type')
+      //   .addEventListener('change', handleSelectSort);
 
       async function navBtn() {
         document

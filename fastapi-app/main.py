@@ -170,3 +170,9 @@ def read_section_page():
     with open("templates/post/index.html", "r") as file:
         content = file.read()
     return HTMLResponse(content=content)
+
+@app.get("/tasks/completed", response_class=HTMLResponse)
+def read_section_page():
+    with open("templates/tasks/completed/index.html", "r") as file:
+        content = file.read()
+    return HTMLResponse(content=content)
