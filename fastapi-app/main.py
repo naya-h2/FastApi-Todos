@@ -43,13 +43,22 @@ class SortingType(str, Enum):
     fast = "fast"
     slow = "slow"
 
+class DeadlineType(str, Enum):
+    today = "today"
+    tomorrow = "tomorrow"
+    week = "week"
+
 # To-Do 목록 조회
 @app.get("/todos", response_model=list[TodoItem])
-def get_todos(section: Union[str, None] = None, sort:Union[SortingType, None] = SortingType.fast):
+def get_todos(section: Union[str, None] = None, sort:Union[SortingType, None] = SortingType.fast, deadline: Union[DeadlineType, None] = None, isCompleted: bool = False):
     items = load_todos()
+
+    # isCompleted
+    items = [item for item in items if item["completed"] == isCompleted]
+    
     if section:
         items = [item for item in items if item["section"] == section]
-    
+
     if(sort == SortingType.fast):
         sorted_tasks = sorted(
         items, 
@@ -65,8 +74,8 @@ def get_todos(section: Union[str, None] = None, sort:Union[SortingType, None] = 
         )
         items = sorted_tasks
 
-
     return items
+
 
 @app.post("/todos/deadline", response_model=list[TodoItem], description="데드라인별 todo 조회")
 def get_deadline_todos(year:Union[str, None] = None, month:Union[str, None] = None):

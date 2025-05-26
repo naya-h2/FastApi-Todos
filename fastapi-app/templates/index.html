@@ -119,6 +119,10 @@
         border-right: 1px solid #f3f3f3;
       }
 
+      hr {
+        border: 1px solid #f3f3f3;
+      }
+
       body {
         display: flex;
       }
@@ -158,6 +162,15 @@
         text-decoration: none;
         color: gray;
       }
+
+      .hr {
+        border-bottom: 1px solid #f3f3f3;
+        margin: 16px 0;
+      }
+
+      .completed {
+        margin-top: 48px;
+      }
     </style>
   </head>
 
@@ -176,9 +189,14 @@
       <button id="nav-inbox" class="nav-btn">
         <span class="emoji">📬</span>기본함
       </button>
-      <hr />
+      <div class="hr"></div>
+
       <p>section</p>
       <div id="todo-section"></div>
+      <div class="hr"></div>
+      <button id="nav-inbox" class="nav-btn">
+        <span class="emoji">☑️</span>완료된 할 일
+      </button>
     </nav>
     <section>
       <header>
@@ -196,6 +214,8 @@
       </select>
 
       <div id="todo-list"></div>
+      <div class="completed">완료</div>
+      <div id="todo-completed"></div>
     </section>
 
     <script>
@@ -265,6 +285,10 @@
       async function fetchTodos(sortType = 'fast') {
         const response = await fetch(`/todos?sort=${sortType ?? ''}`);
         const todos = await response.json();
+
+        const response_c = await fetch(`/todos?isCompleted=true`);
+        const todos_c = await response_c.json();
+
         const todoList = document.getElementById('todo-list');
         todoList.innerHTML = '';
         todos.forEach((todo) => {
@@ -338,6 +362,60 @@
           // li.appendChild(btnDiv);
 
           todoList.appendChild(li);
+        });
+
+        const completedList = document.getElementById('todo-completed');
+        todos_c.forEach((todo) => {
+          const li = document.createElement('div');
+          li.className = 'todo-box';
+
+          //체크박스 & 내용
+          const left = document.createElement('div');
+          left.className = 'todobox-left';
+          const checkBox = document.createElement('input');
+          checkBox.id = todo.id;
+          checkBox.type = 'checkbox';
+          checkBox.className = 'todo-checkbox';
+          checkBox.defaultChecked = todo.completed;
+          checkBox.addEventListener('click', async () => {
+            await editTodo(
+              todo.id,
+              todo.title,
+              todo.description,
+              todo.section,
+              !todo.completed,
+              todo.deadline
+            );
+            if (todo.completed === false) window.alert('할일을 완료했습니다!');
+            else window.alert('할일 완료를 취소하였습니다.');
+          });
+          left.appendChild(checkBox);
+
+          const label = document.createElement('div');
+          label.textContent = `${todo.title}: ${todo.description}`;
+          left.appendChild(label);
+          li.appendChild(left);
+
+          const right = document.createElement('div');
+          right.className = 'todobox-right';
+          const section = document.createElement('span');
+          section.className = `todobox-section`;
+          section.textContent = todo.section;
+          const idx = sections.indexOf(todo.section);
+          section.style.backgroundColor =
+            SECTION_COLOR[idx % SECTION_COLOR.length];
+          right.appendChild(section);
+
+          if (todo?.deadline) {
+            const deadline = document.createElement('span');
+            deadline.className = `todobox-deadline`;
+            deadline.textContent = todo.deadline;
+            right.appendChild(deadline);
+          }
+
+          li.appendChild(right);
+
+          completedList.appendChild(li);
         });
       }
 
