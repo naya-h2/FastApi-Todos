@@ -175,6 +175,10 @@
       .completed {
         margin-top: 48px;
       }
+      #nav-inbox {
+        border-radius: 8px;
+        background-color: #f3f3f3;
+      }
     </style>
   </head>
 
@@ -453,10 +457,7 @@
 
         document
           .getElementById('nav-inbox')
-          .addEventListener(
-            'click',
-            () => (window.location.href = '/tasks/inbox')
-          );
+          .addEventListener('click', () => (window.location.href = '/'));
 
         document
           .getElementById('nav-completed')
