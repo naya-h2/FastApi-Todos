@@ -49,6 +49,11 @@
         <stringProp name="ThreadGroup.delay"></stringProp>
       </ThreadGroup>
       <hashTree>
+        <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Think Time" enabled="true">
+          <stringProp name="ConstantTimer.delay">500</stringProp> <!-- 500ms -->
+        </ConstantTimer>
+        <hashTree/>
+        
         <!-- 샘플러 1: GET /todos (루트 엔드포인트 테스트) -->
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="todos" enabled="true">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
