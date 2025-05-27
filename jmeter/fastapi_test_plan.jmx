@@ -92,8 +92,8 @@
           <stringProp name="HTTPSampler.monitor">false</stringProp>
           <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding">application/json</stringProp>
-        </HTTPSamplerProxy> -->
-        <hashTree/>
+        </HTTPSamplerProxy>
+        <hashTree/> -->
         <!-- 샘플러 3: GET /section (섹션 조회) -->
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /section" enabled="true">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
