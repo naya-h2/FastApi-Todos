@@ -15,7 +15,6 @@ scrape_configs:
   - job_name: 'cadvisor'
     static_configs:
       - targets: ['cadvisor:8080']
-
-remote_write:
-  - url: 'http://influxdb:8086/api/v2/write?org=opensource&bucket=mydb&precision=ns'
-    bearer_token: 5Yaj0YmESH5nzBx0k6ff3a_18mJp1aaXUoWl1ISr93gONKjITK8tADZjRlLt71tD91Y3cfWFj09H6s5Wl8atkw==
+# remote_write:
+#   - url: 'http://influxdb:8086/api/v2/write?org=opensource&bucket=mydb&precision=ns'
+#     bearer_token: 5Yaj0YmESH5nzBx0k6ff3a_18mJp1aaXUoWl1ISr93gONKjITK8tADZjRlLt71tD91Y3cfWFj09H6s5Wl8atkw==
