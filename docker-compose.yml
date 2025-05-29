@@ -70,6 +70,21 @@ services:
     networks:
       - loadtest-net
 
+  influxdb:
+    image: influxdb:latest
+    container_name: influxdb
+    ports:
+      - '8086:8086'
+    volumes:
+      - ./influxdb/config:/etc/influxdb
+      - influxdb-data:/var/lib/influxdb
+    environment:
+      - INFLUXDB_ADMIN_ENABLED=true
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=admin
+    networks:
+      - loadtest-net
+
   jmeter:
     build:
       context: ./jmeter
