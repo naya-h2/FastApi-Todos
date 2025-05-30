@@ -19,7 +19,7 @@ app = FastAPI()
 Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
 influx_client = InfluxDBClient(
-    url="http://influxdb:8086",            # InfluxDB URL (도커 네트워크 이름 또는 IP)
+    url="http://3.34.251.230:8086",            # InfluxDB URL (도커 네트워크 이름 또는 IP)
     token="5Yaj0YmESH5nzBx0k6ff3a_18mJp1aaXUoWl1ISr93gONKjITK8tADZjRlLt71tD91Y3cfWFj09H6s5Wl8atkw==",       # 발급받은 API 토큰
     org="opensource"                         # 조직명
 )
@@ -41,7 +41,7 @@ async def influx_metrics_middleware(request: Request, call_next):
             .field("duration", duration)
             .field("status_code", response.status_code)
         )
-        write_api.write(bucket="mydb", record=point)
+        write_api.write(bucket="mydb", org="opensource", record=point)
     except Exception as e:
         print(f"InfluxDB write error: {e}")
 
