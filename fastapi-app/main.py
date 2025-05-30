@@ -25,6 +25,7 @@ influx_client = InfluxDBClient(
 )
 write_api = influx_client.write_api(write_options=SYNCHRONOUS)
 
+
 # 2) 요청마다 메트릭 기록하는 미들웨어
 @app.middleware("http")
 async def influx_metrics_middleware(request: Request, call_next):
@@ -32,15 +33,18 @@ async def influx_metrics_middleware(request: Request, call_next):
     response = await call_next(request)
     duration = time.time() - start
 
-    # 3) 메트릭 포인트 생성 및 기록
-    point = (
-        Point("http_requests")
-        .tag("method", request.method)
-        .tag("path", request.url.path)
-        .field("duration", duration)
-        .field("status_code", response.status_code)
-    )
-    write_api.write(bucket="mydb", record=point)
+    try:
+        point = (
+            Point("http_requests")
+            .tag("method", request.method)
+            .tag("path", request.url.path)
+            .field("duration", duration)
+            .field("status_code", response.status_code)
+        )
+        write_api.write(bucket="mydb", record=point)
+    except Exception as e:
+        print(f"InfluxDB write error: {e}")
+
     return response
 
 # To-Do 항목 모델
