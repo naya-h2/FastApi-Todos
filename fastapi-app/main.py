@@ -18,34 +18,34 @@ app = FastAPI()
 # Prometheus 메트릭스 엔드포인트 (/metrics)
 Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
-influx_client = InfluxDBClient(
-    url="http://3.34.251.230:8086",            # InfluxDB URL (도커 네트워크 이름 또는 IP)
-    token="5Yaj0YmESH5nzBx0k6ff3a_18mJp1aaXUoWl1ISr93gONKjITK8tADZjRlLt71tD91Y3cfWFj09H6s5Wl8atkw==",       # 발급받은 API 토큰
-    org="opensource"                         # 조직명
-)
-write_api = influx_client.write_api(write_options=SYNCHRONOUS)
+# influx_client = InfluxDBClient(
+#     url="http://3.34.251.230:8086",            # InfluxDB URL (도커 네트워크 이름 또는 IP)
+#     token="5Yaj0YmESH5nzBx0k6ff3a_18mJp1aaXUoWl1ISr93gONKjITK8tADZjRlLt71tD91Y3cfWFj09H6s5Wl8atkw==",       # 발급받은 API 토큰
+#     org="opensource"                         # 조직명
+# )
+# write_api = influx_client.write_api(write_options=SYNCHRONOUS)
 
 
-# 2) 요청마다 메트릭 기록하는 미들웨어
-@app.middleware("http")
-async def influx_metrics_middleware(request: Request, call_next):
-    start = time.time()
-    response = await call_next(request)
-    duration = time.time() - start
+# # 2) 요청마다 메트릭 기록하는 미들웨어
+# @app.middleware("http")
+# async def influx_metrics_middleware(request: Request, call_next):
+#     start = time.time()
+#     response = await call_next(request)
+#     duration = time.time() - start
 
-    try:
-        point = (
-            Point("http_requests")
-            .tag("method", request.method)
-            .tag("path", request.url.path)
-            .field("duration", duration)
-            .field("status_code", response.status_code)
-        )
-        write_api.write(bucket="mydb", org="opensource", record=point)
-    except Exception as e:
-        print(f"InfluxDB write error: {e}")
+#     try:
+#         point = (
+#             Point("http_requests")
+#             .tag("method", request.method)
+#             .tag("path", request.url.path)
+#             .field("duration", duration)
+#             .field("status_code", response.status_code)
+#         )
+#         write_api.write(bucket="mydb", org="opensource", record=point)
+#     except Exception as e:
+#         print(f"InfluxDB write error: {e}")
 
-    return response
+#     return response
 
 # To-Do 항목 모델
 class TodoItem(BaseModel):
