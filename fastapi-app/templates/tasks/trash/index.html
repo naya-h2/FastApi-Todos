@@ -3,13 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>휴지통 | 투두💫</title>
+
     <link
       rel="stylesheet"
       as="style"
       crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
     />
-    <title>section별 할일 보기</title>
     <style>
       html {
         font-family: 'Pretendard Variable', Pretendard, system-ui, -apple-system,
@@ -174,6 +175,10 @@
       .completed {
         margin-top: 48px;
       }
+      #nav-trash {
+        border-radius: 8px;
+        background-color: #f3f3f3;
+      }
       .mini-btn {
         background: none;
         border: none;
@@ -186,6 +191,7 @@
       }
     </style>
   </head>
+
   <body>
     <nav>
       <p><b>20211550 안희원</b> 님, 안녕하세요!</p>
@@ -215,7 +221,7 @@
     </nav>
     <section>
       <header>
-        <h3 id="section_name"></h3>
+        <h3>휴지통</h3>
       </header>
       <button class="nav-btn">
         <a href="/post">+ 할 일 추가</a>
@@ -223,14 +229,7 @@
 
       <br />
 
-      <select id="sort-type" defaultSelected="fast">
-        <option id="fast" value="fast">deadline 빠른 순</option>
-        <option id="slow" value="slow">deadline 느린 순</option>
-      </select>
-
       <div id="todo-list"></div>
-      <div class="completed">완료</div>
-      <div id="todo-completed"></div>
     </section>
 
     <script>
@@ -244,6 +243,24 @@
         '#d4f0f0',
       ];
       let sections;
+      async function fetchSections() {
+        const response = await fetch('/sections');
+        sections = await response.json();
+        const todoSection = document.getElementById('todo-section');
+        sections.forEach((section, idx) => {
+          const op = document.createElement('button');
+          op.id = idx;
+          op.value = section;
+          op.innerHTML = section;
+          op.className = 'nav-btn';
+
+          op.addEventListener('click', () => {
+            window.location.href = `/section?s=${section}`;
+          });
+          todoSection.appendChild(op);
+        });
+      }
+
       async function editTodo(
         id,
         title,
@@ -274,14 +291,10 @@
         });
       }
 
-      async function fetchTodos(section) {
-        const response = await fetch(`/todos?section=${section ?? ''}`);
+      async function fetchTodos() {
+        const response = await fetch(`/trashs`);
         const todos = await response.json();
 
-        const response_c = await fetch(
-          `/todos?isCompleted=true&section=${section ?? ''}`
-        );
-        const todos_c = await response_c.json();
         const todoList = document.getElementById('todo-list');
         todoList.innerHTML = '';
         todos.forEach((todo) => {
@@ -292,24 +305,19 @@
           btnDiv.style.justifyContent = 'flex-end';
           btnDiv.className = 'btnbox';
 
-          const editBtn = document.createElement('button');
-          editBtn.className = 'mini-btn';
-          editBtn.textContent = 'Edit';
-          editBtn.addEventListener('click', () => {
-            window.location.href = `/edit?todo_id=${todo.id}`;
+          const reBtn = document.createElement('button');
+          reBtn.className = 'mini-btn';
+          reBtn.textContent = 'Put back';
+          reBtn.addEventListener('click', async () => {
+            const res = await fetch(`/trashs?todo_id=${todo.id}`, {
+              method: 'DELETE',
+            });
+            if (res.ok) window.alert('TODO가 성공적으로 복구되었습니다!');
+            window.location.href = `/section?s=${todo.section}`;
           });
-          btnDiv.appendChild(editBtn);
-
-          const delBtn = document.createElement('button');
-          delBtn.className = 'mini-btn';
-          delBtn.textContent = 'Delete';
-          delBtn.addEventListener('click', () => {
-            deleteTodo(todo.id);
-            window.location.reload();
-          });
-          btnDiv.appendChild(delBtn);
-
+          btnDiv.appendChild(reBtn);
           box.appendChild(btnDiv);
+
           const li = document.createElement('div');
           li.className = 'todo-box';
 
@@ -361,61 +369,9 @@
           box.appendChild(li);
           todoList.appendChild(box);
         });
-
-        const completedList = document.getElementById('todo-completed');
-        todos_c.forEach((todo) => {
-          const li = document.createElement('div');
-          li.className = 'todo-box';
-
-          //체크박스 & 내용
-          const left = document.createElement('div');
-          left.className = 'todobox-left';
-          const checkBox = document.createElement('input');
-          checkBox.id = todo.id;
-          checkBox.type = 'checkbox';
-          checkBox.className = 'todo-checkbox';
-          checkBox.defaultChecked = todo.completed;
-          checkBox.addEventListener('click', async () => {
-            await editTodo(
-              todo.id,
-              todo.title,
-              todo.description,
-              todo.section,
-              !todo.completed,
-              todo.deadline
-            );
-            if (todo.completed === false) window.alert('할일을 완료했습니다!');
-            else window.alert('할일 완료를 취소하였습니다.');
-          });
-          left.appendChild(checkBox);
-
-          const label = document.createElement('div');
-          label.textContent = `${todo.title}: ${todo.description}`;
-          left.appendChild(label);
-          li.appendChild(left);
-
-          const right = document.createElement('div');
-          right.className = 'todobox-right';
-          const section = document.createElement('span');
-          section.className = `todobox-section`;
-          section.textContent = todo.section;
-          const idx = sections.indexOf(todo.section);
-          section.style.backgroundColor =
-            SECTION_COLOR[idx % SECTION_COLOR.length];
-          right.appendChild(section);
-
-          if (todo?.deadline) {
-            const deadline = document.createElement('span');
-            deadline.className = `todobox-deadline`;
-            deadline.textContent = todo.deadline;
-            right.appendChild(deadline);
-          }
-
-          li.appendChild(right);
-
-          completedList.appendChild(li);
-        });
       }
+
+      fetchSections();
 
       async function navBtn() {
         document
@@ -457,44 +413,8 @@
           );
       }
 
-      async function fetchSections() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const cur_section = urlParams.get('s');
-
-        const response = await fetch('/sections');
-        sections = await response.json();
-        const todoSection = document.getElementById('todo-section');
-        sections.forEach((section, idx) => {
-          const op = document.createElement('button');
-          op.id = idx;
-          op.value = section;
-          op.innerHTML = section;
-          op.className = 'nav-btn';
-
-          if (section == cur_section) {
-            // console.log(section)
-            op.style.borderRadius = '8px';
-            op.style.backgroundColor = '#f3f3f3';
-          }
-
-          op.addEventListener('click', () => {
-            window.location.href = `/section?s=${section}`;
-          });
-          todoSection.appendChild(op);
-        });
-      }
-
-      // 페이지가 로드될 때
-      window.onload = function () {
-        const urlParams = new URLSearchParams(window.location.search);
-        const section = urlParams.get('s');
-
-        document.getElementById('section_name').textContent = `${section}`;
-
-        fetchTodos(section);
-      };
       navBtn();
-      fetchSections();
+      fetchTodos();
     </script>
   </body>
 </html>

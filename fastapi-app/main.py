@@ -66,9 +66,19 @@ def load_todos():
             return json.load(file)
     return []
 
+def load_trashs():
+    if os.path.exists("trash.json"):
+        with open("trash.json", "r") as file:
+            return json.load(file)
+    return []
+
 # JSON 파일에 To-Do 항목 저장
 def save_todos(todos):
     with open(TODO_FILE, "w") as file:
+        json.dump(todos, file, indent=4)
+
+def save_del_todos(todos):
+    with open("trash.json", "w") as file:
         json.dump(todos, file, indent=4)
 
 class SortingType(str, Enum):
@@ -211,8 +221,37 @@ def update_todo(todo_id: int, updated_todo: TodoItem):
 @app.delete("/todos/{todo_id}", response_model=dict)
 def delete_todo(todo_id: int):
     todos = load_todos()
-    todos = [todo for todo in todos if todo["id"] != todo_id]
+    trashs = load_trashs()
+    new_todos = []
+    for todo in todos:
+        if todo["id"] != todo_id:
+            new_todos.append(todo)
+        else: trashs.append(todo)
+            
+    save_todos(new_todos)
+    save_del_todos(trashs)
+    return {"message": "To-Do item deleted"}
+
+@app.get("/trashs", response_model=list[TodoItem])
+def get_trashs():
+    items = load_trashs()
+    return items
+
+@app.delete("/trashs", response_model=dict)
+def delete_trash(todo_id: int):
+    trashs = load_trashs()
+    todos = load_todos()
+    new_trashs = []
+    for trash in trashs:
+        if todo_id == trash["id"]:
+            todos.append(trash)
+        else: new_trashs.append(trash)
+    print(new_trashs)
+    print(todos)
+
+    save_del_todos(new_trashs)
     save_todos(todos)
+
     return {"message": "To-Do item deleted"}
 
 @app.get("/sections", response_model=list[str])
@@ -259,5 +298,11 @@ def read_section_page():
 @app.get("/tasks/day", response_class=HTMLResponse)
 def read_section_page():
     with open("templates/tasks/day/index.html", "r") as file:
+        content = file.read()
+    return HTMLResponse(content=content)
+
+@app.get("/tasks/trash", response_class=HTMLResponse)
+def read_section_page():
+    with open("templates/tasks/trash/index.html", "r") as file:
         content = file.read()
     return HTMLResponse(content=content)

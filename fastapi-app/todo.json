@@ -56,19 +56,19 @@
         "deadline": "2025-04-19"
     },
     {
-        "id": 1747144753045,
-        "title": "10\uc8fc\ucc28 \uacfc\uc81c",
-        "description": "todo \uac1c\uc120\ud558\uae30",
-        "completed": false,
-        "section": "\uc624\ud508\uc18c\uc2a4",
-        "deadline": "2025-05-26"
-    },
-    {
         "id": 1749002154077,
         "title": "\ud300\ud50c",
         "description": "\uacbd\uc9c4\ub300\ud68c \ubc1c\ud45c \uc900\ube44",
         "completed": false,
         "section": "\ucea1\ub514",
         "deadline": "2025-06-04"
+    },
+    {
+        "id": 1749004758702,
+        "title": "\ud300\ud50c 3\ud68c\ucc28",
+        "description": "final \ubc1c\ud45c \uc900\ube44",
+        "completed": false,
+        "section": "\uc778\uc5b8\uac1c",
+        "deadline": ""
     }
 ]
