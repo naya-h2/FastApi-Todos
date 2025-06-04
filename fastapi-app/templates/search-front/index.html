@@ -3,14 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TODO💫 - 안희원</title>
-
     <link
       rel="stylesheet"
       as="style"
       crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
     />
+    <title>섹션 | TODO💫</title>
     <style>
       html {
         font-family: 'Pretendard Variable', Pretendard, system-ui, -apple-system,
@@ -93,13 +92,6 @@
         border-radius: 24px;
       }
 
-      input {
-        padding: 16px 12px;
-
-        border-radius: 12px;
-        border: 1px solid #d9d9d9;
-      }
-
       label {
         display: flex;
         flex-direction: column;
@@ -118,8 +110,9 @@
 
       section {
         padding: 0 16px;
+        margin: 0 auto;
         min-width: 370px;
-        width: 60%;
+        width: 80%;
         border-right: 1px solid #f3f3f3;
       }
 
@@ -159,8 +152,6 @@
 
       header {
         padding: 14px 20px;
-        display: flex;
-        justify-content: space-between;
       }
 
       a {
@@ -177,10 +168,6 @@
       .completed {
         margin-top: 48px;
       }
-      #nav-inbox {
-        border-radius: 8px;
-        background-color: #f3f3f3;
-      }
       .mini-btn {
         background: none;
         border: none;
@@ -191,55 +178,51 @@
         color: #8f8f8f;
         cursor: pointer;
       }
+      .search-box {
+        padding-left: 32px; /* pl-[32px] */
+        width: 100%; /* w-full */
+        font-size: 16px; /* text-[16px] */
+        line-height: 24px; /* leading-[24px] */
+        border-style: none;
+        border-bottom: 1px solid #e5e5e5; /* border-b border-solid border-grey-10 */
+        background-color: transparent; /* dark:bg-[transparent] */
+        outline: none;
+        width: 100%; /* 부모 요소의 크기에 맞춰서 */
+        box-sizing: border-box;
+      }
+
+      .search-box::placeholder {
+        color: #999999; /* placeholder-grey-60 */
+      }
+
+      .search-box:focus {
+        border-color: #007bff; /* focus:border-primary */
+      }
+      .search-keyword {
+        color: #007bff;
+      }
+      .highlight {
+        background-color: rgb(255, 237, 145);
+      }
     </style>
   </head>
-
   <body>
-    <nav>
-      <p><b>20211550 안희원</b> 님, 안녕하세요!</p>
-      <button id="nav-today" class="nav-btn">
-        <span class="emoji">⏰</span>오늘
-      </button>
-      <button id="nav-tomorrow" class="nav-btn">
-        <span class="emoji">☀️</span>내일
-      </button>
-      <button id="nav-week" class="nav-btn">
-        <span class="emoji">📅</span>다음 7일
-      </button>
-      <button id="nav-inbox" class="nav-btn">
-        <span class="emoji">📬</span>기본함
-      </button>
-      <div class="hr"></div>
-
-      <p>section</p>
-      <div id="todo-section"></div>
-      <div class="hr"></div>
-      <button id="nav-completed" class="nav-btn">
-        <span class="emoji">☑️</span>완료된 할 일
-      </button>
-      <button id="nav-trash" class="nav-btn">
-        <span class="emoji">🗑️</span>휴지통
-      </button>
-    </nav>
     <section>
       <header>
-        <h3>기본함</h3>
-        <button class="mini-btn" id="search-btn">Search</button>
+        <h3 id="header-title"></h3>
       </header>
-      <button class="nav-btn">
-        <a href="/post">+ 할 일 추가</a>
-      </button>
+      <form>
+        <input
+          id="keyword"
+          name="keyword"
+          class="search-box"
+          placeholder="검색어를 입력하세요. (ex. 과제)"
+        />
+      </form>
 
       <br />
 
-      <select id="sort-type" defaultSelected="fast">
-        <option id="fast" value="fast">deadline 빠른 순</option>
-        <option id="slow" value="slow">deadline 느린 순</option>
-      </select>
-
       <div id="todo-list"></div>
-      <div class="completed">완료</div>
-      <div id="todo-completed"></div>
     </section>
 
     <script>
@@ -253,29 +236,44 @@
         '#d4f0f0',
       ];
       let sections;
-      async function fetchSections() {
-        const response = await fetch('/sections');
-        sections = await response.json();
-        const todoSection = document.getElementById('todo-section');
-        sections.forEach((section, idx) => {
-          const op = document.createElement('button');
-          op.id = idx;
-          op.value = section;
-          op.innerHTML = section;
-          op.className = 'nav-btn';
+      function highlightWordInBlock() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const keyword = urlParams.get('keyword');
+        const word = keyword;
+        const block = document.getElementById('todo-list'); // 특정 블록 선택
 
-          op.addEventListener('click', () => {
-            window.location.href = `/section?s=${section}`;
-          });
-          todoSection.appendChild(op);
-        });
+        if (!word) {
+          console.log('키워드가 없습니다.');
+          return; // 키워드가 없으면 실행하지 않음
+        }
+
+        // 텍스트 노드만 처리
+        function highlightTextNodes(node) {
+          if (node.nodeType === Node.TEXT_NODE) {
+            const regex = new RegExp(`(${word})`, 'gi'); // 대소문자 구분 없이 검색
+            const replacedText = node.textContent.replace(
+              regex,
+              '<span class="highlight">$1</span>'
+            );
+
+            // 새로 생성된 HTML을 DOM으로 변환하여 대체
+            const tempWrapper = document.createElement('div');
+            tempWrapper.innerHTML = replacedText;
+
+            const fragment = document.createDocumentFragment();
+            Array.from(tempWrapper.childNodes).forEach((child) => {
+              fragment.appendChild(child);
+            });
+
+            node.replaceWith(fragment);
+          } else if (node.nodeType === Node.ELEMENT_NODE) {
+            // 자식 노드에 대해 재귀적으로 처리
+            node.childNodes.forEach(highlightTextNodes);
+          }
+        }
+
+        highlightTextNodes(block);
       }
-
-      async function handleSelectSort() {
-        const selectedValue = document.getElementById('sort-type').value;
-        fetchTodos(selectedValue);
-      }
-
       async function editTodo(
         id,
         title,
@@ -306,15 +304,18 @@
         });
       }
 
-      async function fetchTodos(sortType = 'fast') {
-        const response = await fetch(`/todos?sort=${sortType ?? ''}`);
+      async function fetchTodos(keyword) {
+        const response = await fetch(
+          `/search?${keyword ? `keword=${keyword}` : ``}`
+        );
         const todos = await response.json();
-
-        const response_c = await fetch(`/todos?isCompleted=true`);
-        const todos_c = await response_c.json();
 
         const todoList = document.getElementById('todo-list');
         todoList.innerHTML = '';
+        if (todos.length == 0) {
+          todoList.innerHTML = '검색 결과가 없습니다.';
+        }
+
         todos.forEach((todo) => {
           const box = document.createElement('div');
           box.id = `todo-${todo.id}`;
@@ -341,7 +342,6 @@
           btnDiv.appendChild(delBtn);
 
           box.appendChild(btnDiv);
-
           const li = document.createElement('div');
           li.className = 'todo-box';
 
@@ -393,116 +393,26 @@
           box.appendChild(li);
           todoList.appendChild(box);
         });
-
-        const completedList = document.getElementById('todo-completed');
-        todos_c.forEach((todo) => {
-          const li = document.createElement('div');
-          li.className = 'todo-box';
-
-          //체크박스 & 내용
-          const left = document.createElement('div');
-          left.className = 'todobox-left';
-          const checkBox = document.createElement('input');
-          checkBox.id = todo.id;
-          checkBox.type = 'checkbox';
-          checkBox.className = 'todo-checkbox';
-          checkBox.defaultChecked = todo.completed;
-          checkBox.addEventListener('click', async () => {
-            await editTodo(
-              todo.id,
-              todo.title,
-              todo.description,
-              todo.section,
-              !todo.completed,
-              todo.deadline
-            );
-            if (todo.completed === false) window.alert('할일을 완료했습니다!');
-            else window.alert('할일 완료를 취소하였습니다.');
-          });
-          left.appendChild(checkBox);
-
-          const label = document.createElement('div');
-          label.textContent = `${todo.title}: ${todo.description}`;
-          left.appendChild(label);
-          li.appendChild(left);
-
-          const right = document.createElement('div');
-          right.className = 'todobox-right';
-          const section = document.createElement('span');
-          section.className = `todobox-section`;
-          section.textContent = todo.section;
-          const idx = sections.indexOf(todo.section);
-          section.style.backgroundColor =
-            SECTION_COLOR[idx % SECTION_COLOR.length];
-          right.appendChild(section);
-
-          if (todo?.deadline) {
-            const deadline = document.createElement('span');
-            deadline.className = `todobox-deadline`;
-            deadline.textContent = todo.deadline;
-            right.appendChild(deadline);
-          }
-
-          li.appendChild(right);
-
-          completedList.appendChild(li);
-        });
+        highlightWordInBlock();
       }
 
+      async function fetchSections() {
+        const response = await fetch('/sections');
+        sections = await response.json();
+      }
+
+      // 페이지가 로드될 때
+      window.onload = function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const keyword = urlParams.get('keyword');
+
+        document.getElementById('header-title').innerHTML = keyword
+          ? `<span class="search-keyword">${keyword}</span> 에 대한 검색 결과`
+          : '검색';
+
+        fetchTodos(keyword);
+      };
       fetchSections();
-
-      document
-        .getElementById('sort-type')
-        .addEventListener('change', handleSelectSort);
-
-      async function navBtn() {
-        document
-          .getElementById('nav-today')
-          .addEventListener(
-            'click',
-            () => (window.location.href = '/tasks/day?type=today')
-          );
-
-        document
-          .getElementById('nav-tomorrow')
-          .addEventListener(
-            'click',
-            () => (window.location.href = '/tasks/day?type=tomorrow')
-          );
-
-        document
-          .getElementById('nav-week')
-          .addEventListener(
-            'click',
-            () => (window.location.href = '/tasks/day?type=week')
-          );
-
-        document
-          .getElementById('nav-inbox')
-          .addEventListener('click', () => (window.location.href = '/'));
-
-        document
-          .getElementById('nav-completed')
-          .addEventListener(
-            'click',
-            () => (window.location.href = '/tasks/completed')
-          );
-        document
-          .getElementById('nav-trash')
-          .addEventListener(
-            'click',
-            () => (window.location.href = '/tasks/trash')
-          );
-        document
-          .getElementById('search-btn')
-          .addEventListener(
-            'click',
-            () => (window.location.href = '/search-front')
-          );
-      }
-
-      navBtn();
-      fetchTodos();
     </script>
   </body>
 </html>

@@ -261,6 +261,19 @@ def get_sections ():
     unique_sections = list(set(sections))
     return unique_sections
 
+@app.get("/search", response_model=list[TodoItem])
+def search_todos(keword=str):
+    # search_keword = keword.replace(" ", "")
+    search_keword = keword
+    results = []
+    all_items = load_todos()
+    for item in all_items:
+        search_content = item["title"].replace(" ", "") + item["description"].replace(" ", "")
+        if search_keword in search_content:
+            results.append(item)
+    
+    return results
+        
 
 ##########################
 
@@ -304,5 +317,11 @@ def read_section_page():
 @app.get("/tasks/trash", response_class=HTMLResponse)
 def read_section_page():
     with open("templates/tasks/trash/index.html", "r") as file:
+        content = file.read()
+    return HTMLResponse(content=content)
+
+@app.get("/search-front", response_class=HTMLResponse)
+def read_section_page():
+    with open("templates/search-front/index.html", "r") as file:
         content = file.read()
     return HTMLResponse(content=content)
