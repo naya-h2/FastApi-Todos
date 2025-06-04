@@ -10,42 +10,47 @@ import time
 from enum import Enum
 from prometheus_fastapi_instrumentator import Instrumentator
 #influxdb
-from influxdb_client import InfluxDBClient, Point
-from influxdb_client.client.write_api import SYNCHRONOUS
+# from influxdb_client import InfluxDBClient, Point
+# from influxdb_client.client.write_api import SYNCHRONOUS
+import logging
+import time
+from multiprocessing import Queue
+from os import getenv
+from fastapi import Request
+from logging_loki import LokiQueueHandler
 
 app = FastAPI()
 
 # Prometheus 메트릭스 엔드포인트 (/metrics)
 Instrumentator().instrument(app).expose(app, endpoint="/metrics")
+loki_logs_handler = LokiQueueHandler(
+    Queue(-1),
+    url=getenv("LOKI_ENDPOINT"),
+    tags={"application": "fastapi"},
+    version="1",
+)
 
-# influx_client = InfluxDBClient(
-#     url="http://3.34.251.230:8086",            # InfluxDB URL (도커 네트워크 이름 또는 IP)
-#     token="5Yaj0YmESH5nzBx0k6ff3a_18mJp1aaXUoWl1ISr93gONKjITK8tADZjRlLt71tD91Y3cfWFj09H6s5Wl8atkw==",       # 발급받은 API 토큰
-#     org="opensource"                         # 조직명
-# )
-# write_api = influx_client.write_api(write_options=SYNCHRONOUS)
+# Custom access logger (ignore Uvicorn's default logging)
+custom_logger = logging.getLogger("custom.access")
+custom_logger.setLevel(logging.INFO)
 
+# Add Loki handler (assuming `loki_logs_handler` is correctly configured)
+custom_logger.addHandler(loki_logs_handler)
 
-# # 2) 요청마다 메트릭 기록하는 미들웨어
-# @app.middleware("http")
-# async def influx_metrics_middleware(request: Request, call_next):
-#     start = time.time()
-#     response = await call_next(request)
-#     duration = time.time() - start
+async def log_requests(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    duration = time.time() - start_time  # Compute response time
 
-#     try:
-#         point = (
-#             Point("http_requests")
-#             .tag("method", request.method)
-#             .tag("path", request.url.path)
-#             .field("duration", duration)
-#             .field("status_code", response.status_code)
-#         )
-#         write_api.write(bucket="mydb", org="opensource", record=point)
-#     except Exception as e:
-#         print(f"InfluxDB write error: {e}")
+    log_message = (
+        f'{request.client.host} - "{request.method} {request.url.path} HTTP/1.1" {response.status_code} {duration:.3f}s'
+    )
 
-#     return response
+    # **Only log if duration exists**
+    if duration:
+        custom_logger.info(log_message)
+
+    return response
 
 # To-Do 항목 모델
 class TodoItem(BaseModel):
