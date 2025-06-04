@@ -117,7 +117,7 @@ def get_deadline_todos(type:DeadlineType = DeadlineType.today):
     if type == DeadlineType.today:
         current_item = []
         for item in items:
-            if item["deadline"] is None: continue
+            if item["deadline"] is None or not item["deadline"]: continue
 
             deadline_date = datetime.datetime.strptime(item["deadline"], "%Y-%m-%d")
         
@@ -128,7 +128,7 @@ def get_deadline_todos(type:DeadlineType = DeadlineType.today):
     if type == DeadlineType.tomorrow:
         current_item = []
         for item in items:
-            if item["deadline"] is None: continue
+            if item["deadline"] is None or not item["deadline"]: continue
 
             deadline_date = datetime.datetime.strptime(item["deadline"], "%Y-%m-%d")
         
@@ -141,13 +141,12 @@ def get_deadline_todos(type:DeadlineType = DeadlineType.today):
         end_of_week = start_of_week + datetime.timedelta(days=6)          # 이번 주 일요일
         current_item = []
         for item in items:
-            if item["deadline"] is None: continue
+            if item["deadline"] is None or not item["deadline"]: continue
 
             deadline_date = datetime.datetime.strptime(item["deadline"], "%Y-%m-%d").date()
         
             if start_of_week <= deadline_date <= end_of_week:
                 current_item.append(item)
-
     items = current_item
     #날짜순으로 정렬
     sorted_tasks = sorted(
