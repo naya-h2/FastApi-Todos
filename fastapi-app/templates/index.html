@@ -179,6 +179,16 @@
         border-radius: 8px;
         background-color: #f3f3f3;
       }
+      .mini-btn {
+        background: none;
+        border: none;
+        text-decoration: underline;
+        color: #d9d9d9;
+      }
+      .mini-btn:hover {
+        color: #8f8f8f;
+        cursor: pointer;
+      }
     </style>
   </head>
 
@@ -204,6 +214,9 @@
       <div class="hr"></div>
       <button id="nav-completed" class="nav-btn">
         <span class="emoji">☑️</span>완료된 할 일
+      </button>
+      <button id="nav-trash" class="nav-btn">
+        <span class="emoji">🗑️</span>휴지통
       </button>
     </nav>
     <section>
@@ -300,6 +313,32 @@
         const todoList = document.getElementById('todo-list');
         todoList.innerHTML = '';
         todos.forEach((todo) => {
+          const box = document.createElement('div');
+          box.id = `todo-${todo.id}`;
+          const btnDiv = document.createElement('div');
+          btnDiv.style.display = 'flex';
+          btnDiv.style.justifyContent = 'flex-end';
+          btnDiv.className = 'btnbox';
+
+          const editBtn = document.createElement('button');
+          editBtn.className = 'mini-btn';
+          editBtn.textContent = 'Edit';
+          editBtn.addEventListener('click', () => {
+            window.location.href = `/edit?todo_id=${todo.id}`;
+          });
+          btnDiv.appendChild(editBtn);
+
+          const delBtn = document.createElement('button');
+          delBtn.className = 'mini-btn';
+          delBtn.textContent = 'Delete';
+          delBtn.addEventListener('click', () => {
+            deleteTodo(todo.id);
+            window.location.reload();
+          });
+          btnDiv.appendChild(delBtn);
+
+          box.appendChild(btnDiv);
+
           const li = document.createElement('div');
           li.className = 'todo-box';
 
@@ -348,28 +387,8 @@
           }
 
           li.appendChild(right);
-
-          // btn
-          // const btnDiv = document.createElement('div');
-
-          // const editBtn = document.createElement('button');
-          // editBtn.textContent = 'Edit';
-          // editBtn.addEventListener('click', () => {
-          //   window.location.href = `/edit?todo_id=${todo.id}`;
-          // });
-          // btnDiv.appendChild(editBtn);
-
-          // const delBtn = document.createElement('button');
-          // delBtn.textContent = 'Delete';
-          // delBtn.addEventListener('click', () => {
-          //   deleteTodo(todo.id);
-          //   window.location.reload();
-          // });
-          // btnDiv.appendChild(delBtn);
-
-          // li.appendChild(btnDiv);
-
-          todoList.appendChild(li);
+          box.appendChild(li);
+          todoList.appendChild(box);
         });
 
         const completedList = document.getElementById('todo-completed');
@@ -464,6 +483,12 @@
           .addEventListener(
             'click',
             () => (window.location.href = '/tasks/completed')
+          );
+        document
+          .getElementById('nav-trash')
+          .addEventListener(
+            'click',
+            () => (window.location.href = '/tasks/trash')
           );
       }
 
